@@ -6,13 +6,14 @@ const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
 const lgnQuery = require("./loginQuery");
 const stndtQuery = require("./studentQuery");
+const dotenv = require("dotenv").config();
 const cors = require('cors')
 const PrjctQuery = require("./ProjectQuery");
 const connection = mysql.createConnection({
-    host: "sg1-ts6.a2hosting.com",
-    database: "missio20_team3",
+    host: process.env.DBHOST,
+    database: process.env.DBNAME,
     user: "missio20_team3",
-    password: "=BWEzH(R-(&A",
+    password: process.env.DBPASSWORD,
     port: 3306
 });
 
