@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const lgnQuery = require("./loginQuery");
 const stndtQuery = require("./studentQuery");
 const cors = require('cors')
+const PrjctQuery = require("./ProjectQuery");
 const connection = mysql.createConnection({
     host: "sg1-ts6.a2hosting.com",
     database: "missio20_team3",
@@ -62,5 +63,18 @@ app.get("/student/:id", async (req,res) =>{
     let student = await stndtQuery.queryStudent(id,connection);
     res.status(200).send(student);
 })
+
+app.get("/instructions",async (req,res) =>{
+    let code = await stndtQuery.queryInstructions(connection);
+    let newcode = JSON.stringify(code);
+    console.log(newcode.purpleblockimg);
+})
+
+app.post("/projects", async (req,res) =>{
+    const finalArr = await PrjctQuery.ConstructQueryString(connection,req.body);
+    console.log(finalArr.length);
+    res.status(200).send(finalArr);
+})
+
 
 app.listen(5000);
