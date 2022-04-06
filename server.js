@@ -59,17 +59,23 @@ app.post("/login", async (req, res) => {
 
 })
 
+// Grabs student information based on ID
+
 app.get("/student/:id", async (req,res) =>{
     const id = req.params.id;
     let student = await stndtQuery.queryStudent(id,connection);
     res.status(200).send(student);
 })
 
+// Grabs Instructions page information from backend.
+
 app.get("/instructions",async (req,res) =>{
     let code = await stndtQuery.queryInstructions(connection);
     let newcode = JSON.stringify(code);
-    console.log(newcode.purpleblockimg);
+    res.status(200).send(newcode);
 })
+
+// Grabs Projects page information from backend.
 
 app.post("/projects", async (req,res) =>{
     const finalArr = await PrjctQuery.ConstructQueryString(connection,req.body);

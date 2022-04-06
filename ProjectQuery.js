@@ -1,5 +1,7 @@
 
 async function ConstructQueryString(connection, queryArr) {
+
+    // Arrays for storing information form the constructed query strings
     let subscriptionArr = [];
     let activityArr = [];
     let yearLevelArr = [];
@@ -8,6 +10,8 @@ async function ConstructQueryString(connection, queryArr) {
     let uniqueIds = [];
     let uniqueArr = [];
 
+
+    // loops through the queryArray, checks which of the checkboxes are checked and what type they are.
     for (let i = 0; i < queryArr.length; i++) {
 
         if (queryArr[i].checked === true) {
@@ -23,17 +27,25 @@ async function ConstructQueryString(connection, queryArr) {
         }
     }
 
+
+    // Default query string constructors 
     let queryStringSub = "SELECT * FROM Project";
     let queryStringActivity = "SELECT * FROM Project";
     let queryYearLevel = "SELECT * FROM Project";
 
+
+
+    // Loops through all subscription checkboxes, and adds their name onto the query string.
     for (let i = 0; i < subscriptionArr.length; i++) {
         if (i == 0) {
+            // first condition add where clause
             queryStringSub += ` WHERE Subscription = '${subscriptionArr[i]}'`
         } else {
+            // following add OR 
             queryStringSub += ` OR Subscription = '${subscriptionArr[i]}'`
         }
     }
+     // Loops through all activity checkboxes, and adds their name onto the query string.
 
     for (let i = 0; i < activityArr.length; i++) {
         if (i == 0) {
@@ -57,7 +69,8 @@ async function ConstructQueryString(connection, queryArr) {
 
 
 
-
+    // checks if anything is actually contained in the subscription array. i.e has at least one checkbox being checked? 
+    // If there is then we can query the project via the query stirng and push all results to a final results array.
     if (subscriptionArr.length > 0) {
         const subResults = await queryProject(connection, queryStringSub);
 
@@ -65,6 +78,8 @@ async function ConstructQueryString(connection, queryArr) {
             finalResults.push(subResults[i]);
         }
     }
+    // checks if anything is actually contained in the activity array. i.e has at least one checkbox being checked? 
+    // If there is then we can query the project via the query stirng and push all results to a final results array.
     if (activityArr.length > 0) {
         const activityResults = await queryProject(connection, queryStringActivity);
 
@@ -74,16 +89,20 @@ async function ConstructQueryString(connection, queryArr) {
         }
     }
 
-
+    // Could use a set for this, but I decided to use an array to make life easier.
+    // We could get the same project from the above loops (i.e a project can be free AND it can be Animation)
+    // This results in duplicates, therefore we want to filter those duplicates and only return unique projects.
     for (let i = 0; i < finalResults.length; i ++){
         if (uniqueIds.includes(finalResults[i].ProjectID)){
-
+            
         } else{
             uniqueIds.push(finalResults[i].ProjectID);
             uniqueArr.push(finalResults[i]);
         }
     }
     console.log(uniqueArr);
+
+    // returns the array of unique projects.
     return uniqueArr;
 
 
@@ -94,6 +113,8 @@ async function ConstructQueryString(connection, queryArr) {
 
 
 };
+
+
 
 async function queryProject(connection, queryString) {
     return new Promise((resolve, reject) => {
