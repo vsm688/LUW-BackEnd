@@ -84,7 +84,6 @@ app.get("/instructions",async (req,res) =>{
 
 app.post("/projects", async (req,res) =>{
     const finalArr = await PrjctQuery.ConstructQueryString(connection,req.body);
-    console.log(finalArr.length);
     res.status(200).send(finalArr);
 })
 

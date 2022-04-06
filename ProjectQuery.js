@@ -22,17 +22,20 @@ async function ConstructQueryString(connection, queryArr) {
                 activityArr.push(queryArr[i].name);
             }
             if(queryArr[i].type =="Year"){
-                yearLevelArr.push(queryArr[i].name);
+                yearLevelArr.push({lower:queryArr[i].lower, upper:queryArr[i].higher});
+            }
+            if (queryArr[i].type == "Subject") {
+                subjectMatterArr.push(queryArr[i].name);
             }
         }
     }
 
-
+  
     // Default query string constructors 
     let queryStringSub = "SELECT * FROM Project";
     let queryStringActivity = "SELECT * FROM Project";
-    let queryYearLevel = "SELECT * FROM Project";
-
+    let queryStringYearLevel = "SELECT * FROM Project";
+    let queryStringSubject = "SELECT * FROM Project";
 
 
     // Loops through all subscription checkboxes, and adds their name onto the query string.
@@ -55,16 +58,22 @@ async function ConstructQueryString(connection, queryArr) {
         }
     }
 
-
+    for (let i = 0; i < yearLevelArr.length; i++) {
+        if (i == 0) {
+            queryStringYearLevel += ` WHERE Year >= ${yearLevelArr[i].lower} AND Year <= ${yearLevelArr[i].upper} `
+        } else {
+            queryStringYearLevel += ` OR Year >= ${yearLevelArr[i].lower} AND Year <= ${yearLevelArr[i].upper}`
+        }
+    }
     
-    // for (let i = 0; i < yearLevelArr.length; i++) {
-    //     if (i == 0) {
-    //         queryStringActivity += ` WHERE Year = '${yearLevelArr[i]}'`
-    //     } else {
-    //         queryStringActivity += ` OR Year = '${yearLevelArr[i]}'`
-    //     }
-    // }
-
+    for (let i = 0; i < subjectMatterArr.length; i++) {
+        if (i == 0) {
+            queryStringSubject += ` WHERE SubjectMatter1 = '${subjectMatterArr[i]}'`
+        } else {
+            queryStringSubject += ` OR SubjectMatter1 = '${subjectMatterArr[i]}'`
+        }
+    }
+  
 
 
 
@@ -89,6 +98,29 @@ async function ConstructQueryString(connection, queryArr) {
         }
     }
 
+
+    if (yearLevelArr.length > 0) {
+        const yearResults = await queryProject(connection, queryStringYearLevel);
+
+
+        for (let i = 0; i < yearResults.length; i++) {
+            finalResults.push(yearResults[i]);
+        }
+    }
+    
+    if (subjectMatterArr.length > 0) {
+        const subjectResults = await queryProject(connection, queryStringSubject);
+
+
+        for (let i = 0; i < subjectResults.length; i++) {
+            finalResults.push(subjectResults[i]);
+        }
+    }
+
+
+
+
+
     // Could use a set for this, but I decided to use an array to make life easier.
     // We could get the same project from the above loops (i.e a project can be free AND it can be Animation)
     // This results in duplicates, therefore we want to filter those duplicates and only return unique projects.
@@ -100,7 +132,7 @@ async function ConstructQueryString(connection, queryArr) {
             uniqueArr.push(finalResults[i]);
         }
     }
-    console.log(uniqueArr);
+   
 
     // returns the array of unique projects.
     return uniqueArr;
