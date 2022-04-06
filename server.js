@@ -64,6 +64,11 @@ app.post("/login", async (req, res) => {
 app.get("/student/:id", async (req,res) =>{
     const id = req.params.id;
     let student = await stndtQuery.queryStudent(id,connection);
+ 
+  
+    let teacherName = await stndtQuery.queryTeacherName(id,connection);
+    student.TeacherName = teacherName.TeacherName;
+    
     res.status(200).send(student);
 })
 
