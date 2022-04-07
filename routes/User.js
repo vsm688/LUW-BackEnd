@@ -6,6 +6,8 @@ const cors = require("cors");
 router.use(express.json());
 router.use(cors());
 
+// --------------- Managing routes separately from server.js file -------------
+// --------------- backend signup logic ------------------------------
 router.post('/register', (req, res) => {
 
     const name = req.body.name;
@@ -20,7 +22,7 @@ router.post('/register', (req, res) => {
         }
     );
 });
-
+// ---------------- backend login logic ------------------------------
 router.post('/login', (req, res) => {
 
     const name = req.body.name;
