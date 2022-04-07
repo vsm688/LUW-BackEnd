@@ -9,55 +9,13 @@ const stndtQuery = require("./studentQuery");
 const dotenv = require("dotenv").config();
 const cors = require('cors')
 const PrjctQuery = require("./ProjectQuery");
-const connection = mysql.createConnection({
-    host: process.env.DBHOST,
-    database: process.env.DBNAME,
-    user: "missio20_team3",
-    password: process.env.DBPASSWORD,
-    port: 3306
-});
+const connection = require("./config/db");
 
+const userRoute = require("./routes/User");
+app.use("/student", userRoute);
 
 app.use(bodyParser.json());
 app.use(cors());
-
-app.post("/register", async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
-    
-        const student = await lgnQuery.queryEmail(email,connection);
-        
-        console.log("this is the student " , student);
-
-        if(student.length !== 0 ){
-            res.status(400).send("error student already exists");
-        } else{
-            const salt = await bcrypt.genSalt(10);
-            const ePassword = await bcrypt.hash(password, salt);
-            connection.query(`INSERT INTO Student (Name,EMAIL,PASSWORD) VALUES ('${name}', '${email}', '${ePassword}')`);
-            res.status(200).send("ok");
-        }
-    }
-    catch (e) {
-        res.status(500).send("error!" + e);
-    }
-})
-
-app.post("/login", async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        let encryptedPassword = await lgnQuery.queryPassword(email, connection);
-        const equals = await bcrypt.compare(password, encryptedPassword);
-        if (equals) {
-            res.status(200).json("logged in!");
-        } else {
-            res.status(403).send("incorrect login!");        }
-    } catch (e) {
-        console.log(e);
-    }
-
-
-})
 
 // Grabs student information based on ID
 
